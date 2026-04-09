@@ -2,48 +2,61 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-    <header>
-        <h1>Forum</h1>
-        <nav>
-            <a href="/login">Logg inn</a>
-            <a href="/register">Registrer</a>
-        </nav>
-    </header>
+<header>
+    <h1>Forum</h1>
+    <% const currentUser = user || null; %>
+    <% if (currentUser) { %>
+        <span><%= currentUser.username %></span>
+        <a href="/logout">Logg ut</a>
+    <% } else { %>
+        <a href="/login">Logg inn</a>
+        <a href="/register">Registrer</a>
+    <% } %>
+</header>
 
-    <main>
-        <aside>
-            <h2>Kanaler</h2>
-            <ul>
-                <li><a href="/channel/general"># general</a></li>
-                <li><a href="/channel/tech"># tech</a></li>
-                <li><a href="/channel/random"># random</a></li>
-            </ul>
-        </aside>
+<main>
+    <aside>
+        <h2>Kanaler</h2>
+        <ul>
+            <li><a href="/channel/general"># general</a></li>
+            <li><a href="/channel/tech"># tech</a></li>
+            <li><a href="/channel/random"># random</a></li>
+        </ul>
+    </aside>
 
-        <section>
-            <h2># general</h2>
+    <section>
+        <h2># <%= channel || "general" %></h2>
 
-            <div class="messages">
-                <% messages.forEach(message => { %>
-                    <div class="message">
-                        <strong><%= message.username %></strong>
-                        <p><%= message.content %></p>
-                    </div>
-                <% }) %>
-            </div>
+        <div>
+            <% (messages || []).forEach(msg => { %>
+                <div>
+                    <strong><%= msg.username %></strong>
+                    <p><%= msg.content %></p>
+                    <% if (currentUser && currentUser.username === msg.username) { %>
+                        <form action="/delete-message/<%= msg.id %>" method="POST">
+                            <button>Slett</button>
+                        </form>
+                    <% } %>
+                </div>
+            <% }) %>
+        </div>
 
+        <% if (currentUser) { %>
             <form action="/message" method="POST">
-                <input type="text" name="content" placeholder="Skriv en melding..." required>
-                <button type="submit">Send</button>
+                <input type="hidden" name="channel" value="<%= channel %>">
+                <input type="text" name="content" required placeholder="Skriv en melding...">
+                <button>Send</button>
             </form>
-        </section>
-    </main>
+        <% } else { %>
+            <p>Logg inn eller registrer deg for å sende meldinger.</p>
+        <% } %>
+    </section>
+</main>
 
 </body>
 </html>
+
