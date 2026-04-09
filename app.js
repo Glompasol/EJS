@@ -1,86 +1,111 @@
-const path = require("path");
 const express = require("express");
-const { resolve } = require("dns");
-const { rejects } = require("assert");
-const { title } = require("process");
 const sqlite3 = require("sqlite3").verbose();
+const bcrypt = require("bcrypt");
+
 const app = express();
 
-const port = 7270;
+app.set("view engine", "ejs");
 
-const db = new sqlite3.Database(path.join(__dirname, "app.db"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
+const db = new sqlite3.Database("database.db");
 
 db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS songs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      artist TEXT NOT NULL,
-      listened_date TEXT NOT NULL
-    )
-  `)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            content TEXT
+        )
+    `);
 });
 
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.urlencoded({extended: true}));
-
-function dbAll(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows);
+app.get("/", (req, res) => {
+    db.all("SELECT * FROM messages", (err, rows) => {
+        res.render("index", { messages: rows });
     });
-  });
-}
-
-function dbRun(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) return reject(err);
-      resolve(this);
-    });
-  });
-}
-
-app.get("/", async (req, res) => {
-  try {
-    const songs = await dbAll(
-      "SELECT id, title, artist, listened_date FROM songs ORDER BY listened_date DESC, id DESC",
-      []
-    );
-    res.render("index", {title: "Registrer sanger", songs, message: null});
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Noe gikk galt.");
-  }
 });
 
-app.post("/songs", async(req, res) => {
-  try {
-    const {title, artist, listened_date} = req.body;
-    if (!title || !artist || !listened_date) {
-      const songs = await dbAll("SELECT id, title, artist, listened_date FROM songs ORDER BY listened_date DESC, id DESC");
-      return res.status(400).render("index", {title: "Registrer sanger", songs, message: "Fyll ut tittel, artist og dato"});
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(listened_date)) {
-      const songs = await dbAll("SELECT id, title, artist, listened_date FROM songs ORDER BY listened_date DESC, id DESC");
-      return res.status(400).render("index", {title: "Registrer sanger", songs, message: "2009/08/25"});
-    }
-    await dbRun(
-      "INSERT INTO songs (title, artist, listened_date) VALUES (?, ?, ?)",
-      [title.trim(), artist.trim(), listened_date]
+app.post("/message", (req, res) => {
+    const content = req.body.content;
+
+    db.run(
+        "INSERT INTO messages (username, content) VALUES (?, ?)",
+        ["Anonym", content],
+        () => {
+            res.redirect("/");
+        }
     );
-    res.redirect("/");
-  } catch (err) {
-    console.log(err);
-    const songs = await dbAll("SELECT id, title, artist, listened_date FROM songs ORDER BY listened_date DESC, id, DESC");
-    res.status(500).render("index", {title:"Registrer sanger", songs, message:"Kunne ikke lagre sangen"});
-  }
 });
 
-app.listen(PROTOCOL, () => {
-  console.log(`Server kjører på http://localhost:${PORT}`);
+app.get("/register", (req, res) => {
+    res.render("register");
+});
+
+app.post("/register", async (req, res) => {
+    const { username, password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    db.run(
+        "INSERT INTO users (username, password) VALUES (?, ?)",
+        [username, hashedPassword],
+        function (err) {
+            if (err) {
+                return res.send("Brukernavn finnes allerede");
+            }
+            res.redirect("/login");
+        }
+    );
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    db.get(
+        "SELECT * FROM users WHERE username = ?",
+        [username],
+        async (err, user) => {
+            if (!user) {
+                return res.send("Feil brukernavn");
+            }
+
+            const valid = await bcrypt.compare(password, user.password);
+
+            if (!valid) {
+                return res.send("Feil passord");
+            }
+
+            res.send("Innlogging vellykket");
+        }
+    );
+});
+
+app.post("/delete-user", (req, res) => {
+    const username = req.body.username;
+
+    db.run(
+        "DELETE FROM users WHERE username = ?",
+        [username],
+        () => {
+            res.send("Bruker slettet");
+        }
+    );
+});
+
+app.listen(3000, () => {
+    console.log("Server kjører på http://localhost:3000");
 });

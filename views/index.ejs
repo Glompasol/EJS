@@ -1,41 +1,49 @@
-<%- include("partials/header") %>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
 
-<h1><%= title %></h1>
+    <header>
+        <h1>Forum</h1>
+        <nav>
+            <a href="/login">Logg inn</a>
+            <a href="/register">Registrer</a>
+        </nav>
+    </header>
 
-<% if (typeof message !== "undefined" && message) {%>
-  <div class="notice"><%=message%>/div>
-<%}
+    <main>
+        <aside>
+            <h2>Kanaler</h2>
+            <ul>
+                <li><a href="/channel/general"># general</a></li>
+                <li><a href="/channel/tech"># tech</a></li>
+                <li><a href="/channel/random"># random</a></li>
+            </ul>
+        </aside>
 
-<section class="card">
-  <h2>Legg til sang</h2>
-  <form action="/songs" method="POST" class="form">
-      <label for="title">Sangtittel</label>
-      <input id="title" name="title" type="text" required />
+        <section>
+            <h2># general</h2>
 
-      <label for="artist">Artist</label>
-      <input id="artist" name="artist" type="text" required />
+            <div class="messages">
+                <% messages.forEach(message => { %>
+                    <div class="message">
+                        <strong><%= message.username %></strong>
+                        <p><%= message.content %></p>
+                    </div>
+                <% }) %>
+            </div>
 
-      <label for="listened_date">Dato (YYYY-MM-DD)</label>
-      <input id="listened_date" name="listened_date" type="date" required />
+            <form action="/message" method="POST">
+                <input type="text" name="content" placeholder="Skriv en melding..." required>
+                <button type="submit">Send</button>
+            </form>
+        </section>
+    </main>
 
-      <button type="submit">Lagre sang</button>
-  </form>
-  <p class="muted">Dato lagres i format YYYY-MM-DD.</p>
-</section>
-
-<section class="card">
-  <h2>Registrerte sanger</h2>
-  <ul>
-    <% if (songs.length === 0) {%>
-      <li>(Ingen sanger enda)</li>
-    <%}
-    <% for (const s of songs) {%>
-      <li>
-        <strong><%= s.title %></strong> av <em><%= s.artist %</em>
-        <span class="muted">- <%= s.listened_date %></span>
-      </li>
-    <% } %>
-  </ul>
-</section>
-
-<%- include("partials/footer") %>
+</body>
+</html>
