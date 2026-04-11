@@ -47,9 +47,9 @@
 
         <% if (currentUser) { %>
             <form action="/message" method="POST">
-                <input type="hidden" name="channel" value="<%= channel %>">
+                <input type="hidden" name="channel" value="<%= channel || 'general' %>">
                 <input type="text" name="content" required placeholder="Skriv en melding...">
-                <button>Send</button>
+                <button type="submit">Send</button>
             </form>
         <% } else { %>
             <p>Logg inn eller registrer deg for å sende meldinger.</p>
