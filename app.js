@@ -8,7 +8,6 @@ const app = express();
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // ← important safety
 app.use(express.static("public"));
 
 app.use(session({
@@ -16,15 +15,12 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // IMPORTANT (true breaks on localhost)
+        secure: false,
         httpOnly: true
     }
 }));
 
-const db = new sqlite3.Database("database.db", (err) => {
-    if (err) console.error("DB ERROR:", err);
-    else console.log("Connected to database");
-});
+const db = new sqlite3.Database("database.db");
 
 db.serialize(() => {
     db.run(`
@@ -46,10 +42,7 @@ db.serialize(() => {
 });
 
 function requireLogin(req, res, next) {
-    if (!req.session.user) {
-        console.log("Not logged in");
-        return res.redirect("/login");
-    }
+    if (!req.session.user) return res.redirect("/login");
     next();
 }
 
@@ -57,51 +50,28 @@ app.get("/", (req, res) => res.redirect("/channel/general"));
 
 app.get("/channel/:name", (req, res) => {
     const channel = req.params.name;
-    console.log("Fetching messages for:", channel);
 
     db.all("SELECT * FROM messages WHERE channel = ?", [channel], (err, rows) => {
-        if (err) console.error(err);
-
         res.render("index", {
             messages: rows || [],
-            channel: channel,
+            channel,
             user: req.session.user || null
         });
     });
 });
 
-app.post("/message", (req, res) => {
-    console.log("POST /message HIT");
-    console.log("SESSION:", req.session);
-
-    if (!req.session.user) {
-        console.log("SESSION LOST");
-        return res.redirect("/login");
-    }
-
+app.post("/message", requireLogin, (req, res) => {
     let { content, channel } = req.body;
 
     content = content?.trim();
     channel = channel?.trim() || "general";
 
-    if (!content) {
-        return res.redirect("/channel/" + channel);
-    }
-
-    console.log("Saving:", content, "→", channel);
+    if (!content) return res.redirect("/channel/" + channel);
 
     db.run(
         "INSERT INTO messages (username, content, channel) VALUES (?, ?, ?)",
         [req.session.user.username, content, channel],
-        function (err) {
-            if (err) {
-                console.error("DB ERROR:", err.message);
-                return res.send("Database error: " + err.message);
-            }
-
-            console.log("Saved with ID:", this.lastID);
-            res.redirect("/channel/" + channel);
-        }
+        () => res.redirect("/channel/" + channel)
     );
 });
 
@@ -114,7 +84,7 @@ app.post("/delete-message/:id", requireLogin, (req, res) => {
         }
 
         db.run("DELETE FROM messages WHERE id = ?", [id], () => {
-            res.redirect("back");
+            res.redirect("/channel/" + msg.channel);
         });
     });
 });
@@ -149,8 +119,6 @@ app.post("/login", (req, res) => {
         if (!valid) return res.send("Feil brukernavn eller passord");
 
         req.session.user = { username: user.username };
-        console.log("Logged in:", user.username);
-
         res.redirect("/channel/general");
     });
 });
@@ -159,9 +127,4 @@ app.get("/logout", (req, res) => {
     req.session.destroy(() => res.redirect("/login"));
 });
 
-app.get("/debug-session", (req, res) => {
-    res.send(req.session);
-});
-
 app.listen(2000, () => console.log("http://localhost:2000"));
-
