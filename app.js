@@ -47,7 +47,7 @@ db.serialize(() => {
 
 function requireLogin(req, res, next) {
     if (!req.session.user) {
-        console.log("❌ Not logged in");
+        console.log("Not logged in");
         return res.redirect("/login");
     }
     next();
@@ -57,7 +57,7 @@ app.get("/", (req, res) => res.redirect("/channel/general"));
 
 app.get("/channel/:name", (req, res) => {
     const channel = req.params.name;
-    console.log("📥 Fetching messages for:", channel);
+    console.log("Fetching messages for:", channel);
 
     db.all("SELECT * FROM messages WHERE channel = ?", [channel], (err, rows) => {
         if (err) console.error(err);
@@ -71,11 +71,11 @@ app.get("/channel/:name", (req, res) => {
 });
 
 app.post("/message", (req, res) => {
-    console.log("🔥 POST /message HIT");
+    console.log("POST /message HIT");
     console.log("SESSION:", req.session);
 
     if (!req.session.user) {
-        console.log("❌ SESSION LOST");
+        console.log("SESSION LOST");
         return res.redirect("/login");
     }
 
@@ -88,18 +88,18 @@ app.post("/message", (req, res) => {
         return res.redirect("/channel/" + channel);
     }
 
-    console.log("💾 Saving:", content, "→", channel);
+    console.log("Saving:", content, "→", channel);
 
     db.run(
         "INSERT INTO messages (username, content, channel) VALUES (?, ?, ?)",
         [req.session.user.username, content, channel],
         function (err) {
             if (err) {
-                console.error("💀 DB ERROR:", err.message);
+                console.error("DB ERROR:", err.message);
                 return res.send("Database error: " + err.message);
             }
 
-            console.log("✅ Saved with ID:", this.lastID);
+            console.log("Saved with ID:", this.lastID);
             res.redirect("/channel/" + channel);
         }
     );
@@ -149,7 +149,7 @@ app.post("/login", (req, res) => {
         if (!valid) return res.send("Feil brukernavn eller passord");
 
         req.session.user = { username: user.username };
-        console.log("✅ Logged in:", user.username);
+        console.log("Logged in:", user.username);
 
         res.redirect("/channel/general");
     });
