@@ -143,8 +143,60 @@ input[type="text"]:focus {
     background: #333;
 }
 
-/* Login message */
 section p {
     margin-top: 10px;
     color: #888;
+}
+
+.auth-container {
+    width: 300px;
+    margin: 100px auto;
+    padding: 15px;
+    border: 1px solid #333;
+    background: #0d0d0d;
+}
+
+.auth-container h1 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+    color: #fff;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-container input {
+    margin-bottom: 10px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    color: #ddd;
+    padding: 6px;
+    font-family: inherit;
+}
+
+.auth-container input:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.auth-container button {
+    width: 100%;
+}
+
+.auth-container p {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.auth-container a {
+    color: #8ab4ff;
+    text-decoration: none;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
 }

@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
+    <link rel="stylesheet" href="/style.css">
     <meta charset="UTF-8">
     <title>Registrer</title>
 </head>
 <body>
+<div class="auth-container">
 
-<h1>Registrer</h1>
+    <h1>Registrer</h1>
 
-<form action="/register" method="POST">
-    <input type="text" name="username" placeholder="Brukernavn" required>
-    <input type="password" name="password" placeholder="Passord" required>
-    <button type="submit">Registrer</button>
-</form>
+    <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Brukernavn" required>
+        <input type="password" name="password" placeholder="Passord" required>
+        <button type="submit">Registrer</button>
+    </form>
 
+    <p><a href="/login">Har konto?</a></p>
+
+</div>
 </body>
 </html>
