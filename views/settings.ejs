@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <title>Innstillinger</title>
+</head>
+<body class="<%= user?.theme || 'dark' %> <%= user?.fontSize || 'medium' %>">
+
+<div class="auth-container">
+
+    <h1>Innstillinger</h1>
+
+    <form action="/settings" method="POST">
+
+        <label>Tekststørrelse</label>
+        <select name="fontSize">
+            <option value="small">Liten</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Stor</option>
+        </select>
+
+        <label>Tema</label>
+        <select name="theme">
+            <option value="dark" selected>Mørk</option>
+            <option value="light">Lys</option>
+        </select>
+
+        <label>Linjeavstand</label>
+        <select name="lineHeight">
+            <option value="tight">Liten</option>
+            <option value="normal" selected>Medium</option>
+            <option value="loose">Stor</option>
+        </select>
+
+        <label>Kontrast</label>
+        <select name="contrast">
+            <option value="low">Lite</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">Mye</option>
+        </select>
+
+        <label>Brukernavnfarge</label>
+        <select name="nameColor">
+            <option value="green" selected>Grønn</option>
+            <option value="blue">Blå</option>
+            <option value="white">Hvit</option>
+        </select>
+
+        <label>Vis kanalliste</label>
+        <select name="sidebar">
+            <option value="show" selected>Vis</option>
+            <option value="hide">Ikke vis</option>
+        </select>
+
+        <button type="submit">Lagre</button>
+
+    </form>
+
+    <p><a href="/">Tilbake</a></p>
+
+</div>
+
+</body>
+</html>

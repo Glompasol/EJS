@@ -71,6 +71,10 @@ aside a:hover {
     background: #1a1a1a;
 }
 
+aside .down {
+    text-align: end;
+}
+
 section {
     flex: 1;
     padding: 10px;
@@ -103,10 +107,10 @@ button {
     background: #111;
     color: #ccc;
     border: 1px solid #444;
-    padding: 3px 6px;
+    padding: 4px 6px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 button:hover {
@@ -199,4 +203,113 @@ section p {
 
 .auth-container a:hover {
     text-decoration: underline;
+}
+
+.settings-link {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    color: #8ab4ff;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.settings-link:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.auth-container label {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 3px;
+}
+
+.auth-container select {
+    margin-bottom: 10px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    color: #ddd;
+    padding: 5px;
+    font-family: inherit;
+}
+
+/*themes*/
+
+/*dark*/
+body.dark {
+    background: #0a0a0a;
+    color: #d0d0d0;
+}
+
+/*light*/
+body.light {
+    background: #f5f5f5;
+    color: #111;
+}
+
+body.light header,
+body.light aside,
+body.light .auth-container {
+    background: #eaeaea;
+    border-color: #bbb;
+}
+
+body.light input,
+body.light select {
+    background: #fff;
+    color: #000;
+    border-color: #aaa;
+}
+
+/*font size*/
+body.small {
+    font-size: 12px;
+}
+
+body.medium {
+    font-size: 14px;
+}
+
+body.large {
+    font-size: 16px;
+}
+
+/*line spacing*/
+body.tight p { line-height: 1.2; }
+body.normal p { line-height: 1.5; }
+body.loose p { line-height: 1.8; }
+
+/*contrasts*/
+body.low { color: #888; }
+body.high { color: #fff; }
+
+/*name color*/
+body.green strong { color: #6ee7b7; }
+body.blue strong { color: #8ab4ff; }
+body.white strong { color: #ffffff; }
+
+/*show channels*/
+body.hide aside {
+    display: none;
+}
+
+aside ul li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+aside ul li span {
+    font-size: 10px;
+}
+
+.online {
+    order: 2;
+    border-right: none;
+    border-left: 1px solid #333;
+}
+
+.chat {
+    order: 1;
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Forum</title>
 </head>
-<body>
+<body class="<%= user?.theme || 'dark' %><%= user?.fontSize || 'medium' %><%= user?.lineHeight || 'normal' %><%= user?.contrast || 'normal' %><%= user?.nameColor || 'green' %><%= user?.sidebar || 'show' %>">
 
 <header>
     <h1>Forum</h1>
@@ -20,22 +20,52 @@
 </header>
 
 <main>
-    <aside>
-        <h2>Kanaler</h2>
+    <aside class="channel">
+        <h2>Kanaler</h2>     
         <ul>
             <li><a href="/channel/general"># general</a></li>
             <li><a href="/channel/tech"># tech</a></li>
             <li><a href="/channel/random"># random</a></li>
+            <li><a href="/channel/news"># news</a></li>
+            <li><a href="/channel/gaming"># gaming</a></li>
+            <li><a href="/channel/music"># music</a></li>
+            <li><a href="/channel/movies"># movies</a></li>
+            <li><a href="/channel/anime"># anime</a></li>
+            <li><a href="/channel/sports"># sports</a></li>
+            <li><a href="/channel/fitness"># fitness</a></li>
+            <li><a href="/channel/programming"># programming</a></li>
+            <li><a href="/channel/hardware"># hardware</a></li>
+            <li><a href="/channel/ai"># ai</a></li>
+            <li><a href="/channel/history"># history</a></li>
+            <li><a href="/channel/politics"># politics</a></li>
+            <li><a href="/channel/conspiracy"># conspiracy</a></li>
+            <li><a href="/channel/books"># books</a></li>
+            <li><a href="/channel/art"># art</a></li>
+            <li><a href="/channel/memes"># memes</a></li>
+            <li><a href="/channel/offtopic"># offtopic</a></li>
         </ul>
     </aside>
 
-    <section>
+    <aside class="online">
+        <h2>Online</h2>
+        <ul>
+            <% (onlineUsers || []).forEach(u => { %>
+                <li>
+                    <span style="color:#6ee7b7;">●</span>
+                    <%= u %>
+                </li>
+            <% }) %>
+        </ul>
+    </aside>
+
+    <section class="chat">
         <h2># <%= channel || "general" %></h2>
 
         <div>
             <% (messages || []).forEach(msg => { %>
                 <div>
                     <strong><%= msg.username %></strong>
+                    <span style="color:#666; font-size:11px;">[<%= msg.timestamp %>]</span>
                     <p><%= msg.content %></p>
                     <% if (currentUser && currentUser.username === msg.username) { %>
                         <form action="/delete-message/<%= msg.id %>" method="POST">
@@ -57,7 +87,7 @@
         <% } %>
     </section>
 </main>
-
+<a href="/settings" class="settings-link">Innstillinger</a>
 </body>
 </html>
 
